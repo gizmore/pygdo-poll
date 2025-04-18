@@ -1,7 +1,12 @@
+import functools
+
+from pkg_resources import find_eggs_in_zip
+
 from gdo.base.Application import Application
 from gdo.base.GDO_Module import GDO_Module
 from gdo.base.GDT import GDT
 from gdo.base.Util import href
+from gdo.core.GDT_Container import GDT_Container
 from gdo.core.GDT_UInt import GDT_UInt
 from gdo.date.GDT_Duration import GDT_Duration
 from gdo.date.Time import Time
@@ -39,9 +44,16 @@ class module_poll(GDO_Module):
         self.add_sidebar_polls(page)
 
     def add_sidebar_polls(self, page):
+        polls = self.get_sidebar_polls()
+        page._right_bar.add_field(polls)
+
+    @functools.cache
+    def get_sidebar_polls(self) -> GDT:
+        cont = GDT_Container()
         cut = Time.get_date(Application.TIME - self.cfg_max_age_side_polls())
         result = (GDO_Poll.table().select().order('poll_created DESC').
                   select('(SELECT COUNT(*) FROM gdo_pollvote LEFT JOIN gdo_pollchoice ON pv_choice=pc_id WHERE pc_poll=poll_id) AS pc').
                   limit(self.cfg_max_side_polls()).where(f"poll_created >= '{cut}'").nocache().exec())
         for poll in result:
-            page._right_bar.add_field(GDT_Link().href(href('vote', 'show_poll', f"&poll={poll.get_id()}")).text('poll_sidebar', (poll.gdo_value('poll_title'), poll._vals['pc'])))
+            cont.add_field(GDT_Link().href(href('vote', 'show_poll', f"&poll={poll.get_id()}")).text('poll_sidebar', (poll.gdo_value('poll_title'), poll._vals['pc'])))
+        return cont
