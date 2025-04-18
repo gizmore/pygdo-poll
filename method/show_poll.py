@@ -19,4 +19,5 @@ class show_poll(Method):
         poll = self.get_poll()
         card = GDT_Card().gdo(poll)
         card.creator_header()
+        card.
         return card
