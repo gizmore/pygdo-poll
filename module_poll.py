@@ -1,7 +1,5 @@
 import functools
 
-from pkg_resources import find_eggs_in_zip
-
 from gdo.base.Application import Application
 from gdo.base.GDO_Module import GDO_Module
 from gdo.base.GDT import GDT
@@ -51,9 +49,12 @@ class module_poll(GDO_Module):
     def get_sidebar_polls(self) -> GDT:
         cont = GDT_Container()
         cut = Time.get_date(Application.TIME - self.cfg_max_age_side_polls())
-        result = (GDO_Poll.table().select().order('poll_created DESC').
+        result = (GDO_Poll.table().select().
                   select('(SELECT COUNT(*) FROM gdo_pollvote LEFT JOIN gdo_pollchoice ON pv_choice=pc_id WHERE pc_poll=poll_id) AS pc').
-                  limit(self.cfg_max_side_polls()).where(f"poll_created >= '{cut}'").nocache().exec())
+                  order('poll_created DESC').
+                  limit(self.cfg_max_side_polls()).
+                  where(f"poll_created >= '{cut}'").
+                  nocache().exec())
         for poll in result:
             cont.add_field(GDT_Link().href(href('vote', 'show_poll', f"&poll={poll.get_id()}")).text('poll_sidebar', (poll.gdo_value('poll_title'), poll._vals['pc'])))
         return cont

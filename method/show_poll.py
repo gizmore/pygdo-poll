@@ -23,5 +23,8 @@ class show_poll(Method):
         poll = self.get_poll()
         card = GDT_Card().gdo(poll)
         card.creator_header()
-        card.
+        card.get_content().add_field(
+            poll.column('poll_title'),
+            poll.column('poll_descr'),
+        )
         return card
