@@ -7,6 +7,10 @@ from gdo.poll.GDO_Poll import GDO_Poll
 
 class show_poll(Method):
 
+    @classmethod
+    def gdo_trigger(cls) -> str:
+        return 'poll'
+
     def gdo_parameters(self) -> [GDT]:
         return [
             GDT_Object('poll').not_null().table(GDO_Poll.table()),

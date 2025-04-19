@@ -12,7 +12,15 @@ from gdo.poll.GDO_Poll import GDO_Poll
 from gdo.poll.GDO_PollChoice import GDO_PollChoice
 
 
-class create_poll(MethodForm):
+class create(MethodForm):
+
+    @classmethod
+    def gdo_trigger(cls) -> str:
+        return "poll.add"
+
+    @classmethod
+    def gdo_trig(cls) -> str:
+        return 'polla'
 
     def gdo_create_form(self, form: GDT_Form) -> None:
         form.add_field(

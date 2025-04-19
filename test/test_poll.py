@@ -18,5 +18,5 @@ class PollTestCase(GDOTestCase):
 
     def test_01_cli_poll(self):
         giz = cli_gizmore()
-        out = cli_plug(giz, '$poll "Who is major?" "" ')
+        out = cli_plug(giz, '$poll.add "Who is major?" "Peter Lustig" "The other guy" "Third option"')
         self.assertIn('created', out, "Poll was not created.")

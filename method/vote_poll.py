@@ -9,7 +9,15 @@ from gdo.poll.GDT_PollChoice import GDT_PollChoice
 
 
 class vote_poll(MethodForm):
-    
+
+    @classmethod
+    def gdo_trigger(cls) -> str:
+        return 'poll.vote'
+
+    @classmethod
+    def gdo_trig(cls) -> str:
+        return 'pollv'
+
     def gdo_parameters(self) -> [GDT]:
         return [
             GDT_Object('poll').not_null().table(GDO_Poll.table()),
