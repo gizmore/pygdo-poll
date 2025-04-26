@@ -16,5 +16,5 @@ class GDO_PollChoice(GDO):
             GDT_AutoInc('pc_id'),
             GDT_Object('pc_poll').table(GDO_Poll.table()).not_null(),
             GDT_String('pc_text').maxlen(128),
-            GDT_Virtual(GDT_UInt('pc_votes')).query(GDO_PollVote.table().select().where()),
+            GDT_Virtual(GDT_UInt('pc_votes')).query(GDO_PollVote.table().select('COUNT(*)').where(f"pv_choice=pc_id")),
         ]
