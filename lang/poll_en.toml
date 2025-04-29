@@ -1,6 +1,10 @@
 module_poll = "Poll"
 poll_sidebar = "Poll: %s (%s)"
 
+question = "Question"
+max_answers = "Max Answers"
+choices = "Choices"
+
 ##########
 # Create #
 ##########

@@ -37,7 +37,7 @@ class module_poll(GDO_Module):
 
     def gdo_init_sidebar(self, page: 'GDT_Page'):
         page._right_bar.add_field(
-            GDT_Link().href(href('vote', 'create_poll')).text('mt_vote_create_poll'),
+            GDT_Link().href(href('poll', 'create')).text('mt_poll_create'),
         )
         self.add_sidebar_polls(page)
 
