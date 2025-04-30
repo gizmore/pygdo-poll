@@ -33,7 +33,7 @@ class create(MethodForm):
         super().gdo_create_form(form)
 
     def add_choice(self):
-        pass
+        pass # all good :)
 
     def form_submitted(self):
         poll = GDO_Poll.blank({

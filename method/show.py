@@ -6,13 +6,13 @@ from gdo.ui.GDT_Card import GDT_Card
 from gdo.poll.GDO_Poll import GDO_Poll
 
 
-class show_poll(Method):
+class show(Method):
 
     @classmethod
     def gdo_trigger(cls) -> str:
         return 'poll'
 
-    def gdo_parameters(self) -> [GDT]:
+    def gdo_parameters(self) -> list[GDT]:
         return [
             GDT_Object('poll').not_null().table(GDO_Poll.table()),
         ]
