@@ -15,11 +15,7 @@ class vote(MethodForm):
 
     @classmethod
     def gdo_trigger(cls) -> str:
-        return 'poll.vote'
-
-    @classmethod
-    def gdo_trig(cls) -> str:
-        return 'pollv'
+        return ''
 
     def gdo_parameters(self) -> list[GDT]:
         return [
@@ -39,7 +35,6 @@ class vote(MethodForm):
         super().gdo_create_form(form)
 
     def form_submitted(self):
-        uid = self._env_user.get_id()
         poll = self.get_poll()
         chosen = []
         for i, choice in enumerate(poll.get_choices(), 1):
@@ -47,14 +42,27 @@ class vote(MethodForm):
                 chosen.append(choice)
         if len(chosen) > poll.get_max_choices():
             return self.err('err_vote_max_chosen', (poll.get_max_choices(),))
-        (GDO_PollVote.table().delete_query().
+
+        return self.chosen_submitted(chosen)
+
+    def chosen_submitted(self, chosen: list[GDO_PollChoice]):
+        uid = self._env_user.get_id()
+        poll = self.get_poll()
+
+        # delete old
+        result = (GDO_PollVote.table().select().
          join_object('pv_choice').
          where(f"pv_user={uid} AND pc_poll={poll.get_id()}").exec())
+        for old in result:
+            old.delete()
+
         for chose in chosen:
             GDO_PollVote.blank({
                 'pv_user': uid,
                 'pv_choice': chose.get_id(),
             }).insert()
         self.clear_form()
+
         Application.EVENTS.publish('poll.voted', poll, self._env_user, chosen)
-        return self.msg('msg_vote_voted_poll')
+
+        return self.msg('msg_poll_voted')

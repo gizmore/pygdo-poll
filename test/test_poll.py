@@ -19,10 +19,10 @@ class PollTestCase(GDOTestCase):
 
     def test_01_cli_poll(self):
         giz = cli_gizmore()
-        out = cli_plug(giz, '$poll.add --max-votes=2 "Who is major?" "Peter Lustig" "The other guy" "Third option"')
+        out = cli_plug(giz, '$poll.add --max_answers=2 "Who is major?" "Peter Lustig" "The other guy" "Third option"')
         self.assertIn('created', out, "Poll was not created.")
         out = cli_plug(giz, '$poll.vote 1 1 2 3')
-        self.assertIn('max', out, "Poll max vote values are not checked.")
+        self.assertIn('may not enter more than 2', out, "Poll max vote values are not checked.")
         out = cli_plug(giz, '$poll.vote 1 1 2')
         self.assertIn('registered', out, "Poll voting does not work.")
         out = cli_plug(giz, "$poll 1")

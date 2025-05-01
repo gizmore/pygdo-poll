@@ -14,7 +14,15 @@ class GDO_PollChoice(GDO):
         from gdo.poll.GDO_PollVote import GDO_PollVote
         return [
             GDT_AutoInc('pc_id'),
-            GDT_Object('pc_poll').table(GDO_Poll.table()).not_null(),
+            GDT_Object('pc_poll').table(GDO_Poll.table()).not_null().cascade_delete(),
             GDT_String('pc_text').maxlen(128),
-            # GDT_Virtual(GDT_UInt('pc_votes')).query(GDO_PollVote.table().select('COUNT(*)').where(f"pv_choice=pc_id")),
         ]
+
+    def render_title(self) -> str:
+        return self.gdo_val('pc_text')
+
+    def render_percent(self) -> str:
+        total = int(self._vals['total_votes'])
+        if not total:
+            return '?,??%'
+        return str(round(int(self._vals['num_votes']) / total * 100, 1)) + '%'

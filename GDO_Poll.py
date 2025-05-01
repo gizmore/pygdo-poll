@@ -19,14 +19,18 @@ class GDO_Poll(GDO):
             GDT_Title('poll_title').maxlen(192).not_null(),
             GDT_Message('poll_descr'),
             GDT_UInt('poll_max_answers').bytes(1).not_null().initial('1'),
-            # GDT_Join('poll_top_answer'),
             GDT_Creator('poll_creator'),
             GDT_Created('poll_created'),
         ]
 
     def get_choices(self) -> list['GDO_PollChoice']:
         from gdo.poll.GDO_PollChoice import GDO_PollChoice
-        return GDO_PollChoice.table().select().where(f"pc_poll={self.get_id()}").exec().fetch_all()
+        return (GDO_PollChoice.table().select().
+                select("(SELECT COUNT(*) FROM gdo_pollvote WHERE pv_choice = pc_id) num_votes").
+                select(f"(SELECT COUNT(*) FROM gdo_pollvote JOIN gdo_pollchoice ON pc_id=pv_choice WHERE pc_poll = {self.get_id()}) total_votes").
+                where(f"pc_poll={self.get_id()}").
+                nocache().exec().fetch_all())
+
 
     def get_max_choices(self) -> int:
         return self.gdo_value('poll_max_answers')

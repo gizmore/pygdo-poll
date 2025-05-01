@@ -13,6 +13,6 @@ class GDO_PollVote(GDO):
         return [
             GDT_AutoInc('pv_id'),
             GDT_User('pv_user').not_null(),
-            GDT_Object('pv_choice').table(GDO_PollChoice.table()).not_null(),
+            GDT_Object('pv_choice').table(GDO_PollChoice.table()).not_null().cascade_delete(),
             GDT_Created('pv_created'),
         ]
