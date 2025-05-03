@@ -4,6 +4,7 @@ from gdo.base.Application import Application
 from gdo.base.GDO_Module import GDO_Module
 from gdo.base.GDT import GDT
 from gdo.base.Util import href
+from gdo.core.GDT_Bool import GDT_Bool
 from gdo.core.GDT_Container import GDT_Container
 from gdo.core.GDT_UInt import GDT_UInt
 from gdo.date.GDT_Duration import GDT_Duration
@@ -26,15 +27,28 @@ class module_poll(GDO_Module):
 
     def gdo_module_config(self) -> list[GDT]:
         return [
+            GDT_Bool('email_new_polls').not_null().initial('1'),
+            GDT_Bool('email_all_users').not_null().initial('0'),
             GDT_UInt('max_side_polls').not_null().initial('3'),
             GDT_Duration('max_age_side_polls').not_null().initial('1w'),
         ]
+
+    def cfg_email_new_polls(self) -> bool:
+        return self.get_config_value('email_new_polls')
+
+    def cfg_email_all_users(self) -> bool:
+        return self.get_config_value('email_all_users')
 
     def cfg_max_side_polls(self) -> int:
         return self.get_config_value('max_side_polls')
 
     def cfg_max_age_side_polls(self) -> int:
         return self.get_config_value('max_age_side_polls')
+
+    def gdo_user_settings(self) -> list[GDT]:
+        return [
+            GDT_Bool('email_new_polls').not_null().initial('0'),
+        ]
 
     def gdo_init_sidebar(self, page: 'GDT_Page'):
         page._right_bar.add_field(

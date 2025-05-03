@@ -1,4 +1,5 @@
 from gdo.base.Util import href
+from gdo.core.GDO_User import GDO_User
 from gdo.core.GDT_Repeat import GDT_Repeat
 from gdo.core.GDT_String import GDT_String
 from gdo.core.GDT_UInt import GDT_UInt
@@ -41,7 +42,8 @@ class create(MethodForm):
             'poll_descr': self.param_val('question'),
             'poll_max_answers': self.param_val('max_answers'),
         }).insert()
-        for choice in self.param_value('choices'):
+        choices = self.param_value('choices')
+        for choice in choices:
             GDO_PollChoice.blank({
                 'pc_poll': poll.get_id(),
                 'pc_text': choice,
