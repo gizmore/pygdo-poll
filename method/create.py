@@ -27,6 +27,7 @@ class create(MethodForm):
         form.add_field(
             GDT_Title('title').not_null(),
             GDT_Message('question'),
+            GDT_UInt('min_answers').initial('1').not_null().min(1).max(10),
             GDT_UInt('max_answers').initial('1').not_null().min(1).max(10),
             GDT_Repeat(GDT_String('choices')).min(2).max(10).not_null(),
             GDT_Submit('add_choice').calling(self.add_choice).text('add_choice'),
@@ -50,4 +51,4 @@ class create(MethodForm):
             }).insert()
         self.clear_form()
         self.msg('msg_poll_created')
-        return GDT_Redirect().href(href('vote', 'vote_poll', f'&poll={poll.get_id()}')).text('test')
+        return GDT_Redirect().href(href('poll', 'vote', f'&poll={poll.get_id()}')).text('test')

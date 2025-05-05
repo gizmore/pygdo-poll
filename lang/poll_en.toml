@@ -16,6 +16,14 @@ md_poll_create = "Create a new Poll and broadcast it."
 msg_poll_created = "Your Poll has been created."
 add_choice = "Add choice"
 
+########
+# Mail #
+########
+mt_poll_mail = "Mail Poll"
+md_poll_mail = "Cronjob mailing new polls."
+mails_poll_created = "Poll: %s"
+mailb_poll_created = "Hello %s<br/>\nThere is a new poll on %s.<br/>\n<br/>\n%s<br/>\n%s<br/>\n<br/>\n<br/>\nYou can vote via this link:<br/>\n<br/>%s<br/>\n<br/>\nKind Regards<br/>\nThe %2$s System."
+
 #############
 # Vote Poll #
 #############
