@@ -2,7 +2,7 @@ from gdo.base.GDT import GDT
 from gdo.base.Render import Mode
 from gdo.base.Result import Result
 from gdo.base.Trans import Trans, sitename, t
-from gdo.base.Util import url
+from gdo.base.util.href import url
 from gdo.core.GDO_Method import GDO_Method
 from gdo.core.GDO_User import GDO_User
 from gdo.core.MethodCronjob import MethodCronjob

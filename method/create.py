@@ -1,5 +1,4 @@
-from gdo.base.Util import href
-from gdo.core.GDO_User import GDO_User
+from gdo.base.util.href import href
 from gdo.core.GDT_Repeat import GDT_Repeat
 from gdo.core.GDT_String import GDT_String
 from gdo.core.GDT_UInt import GDT_UInt

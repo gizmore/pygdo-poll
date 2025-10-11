@@ -3,7 +3,7 @@ import functools
 from gdo.base.Application import Application
 from gdo.base.GDO_Module import GDO_Module
 from gdo.base.GDT import GDT
-from gdo.base.Util import href
+from gdo.base.util.href import href
 from gdo.core.GDT_Bool import GDT_Bool
 from gdo.core.GDT_Container import GDT_Container
 from gdo.core.GDT_UInt import GDT_UInt
