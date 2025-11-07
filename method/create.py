@@ -23,7 +23,7 @@ class create(MethodForm):
         return 'polla'
 
     def gdo_create_form(self, form: GDT_Form) -> None:
-        form.add_field(
+        form.add_fields(
             GDT_Title('title').not_null(),
             GDT_Message('question'),
             GDT_UInt('min_answers').initial('1').not_null().min(1).max(10),
