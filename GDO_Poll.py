@@ -34,7 +34,7 @@ class GDO_Poll(GDO):
     def render_title(self) -> str:
         return self.gdo_val('poll_title')
 
-    def render_descr(self, mode: Mode=Mode.html) -> str:
+    def render_descr(self, mode: Mode=Mode.render_html) -> str:
         return self.get_descr_column().render(mode)
 
     def get_choices(self) -> list['GDO_PollChoice']:
