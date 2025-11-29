@@ -41,15 +41,15 @@ class vote(MethodForm):
             form.add_field(GDT_PollChoice(f"pc{i}").label('choice', (i, choice.gdo_value('pc_text'))))
         super().gdo_create_form(form)
 
-    def form_submitted(self):
+    async def form_submitted(self):
         poll = self.get_poll()
         chosen = []
         for i, choice in enumerate(poll.get_choices(), 1):
             if self.param_value(f"pc{i}"):
                 chosen.append(choice)
-        return self.chosen_submitted(chosen)
+        return await self.chosen_submitted(chosen)
 
-    def chosen_submitted(self, chosen: list[GDO_PollChoice]):
+    async def chosen_submitted(self, chosen: list[GDO_PollChoice]):
         uid = self._env_user.get_id()
         poll = self.get_poll()
 
@@ -72,6 +72,6 @@ class vote(MethodForm):
             }).insert()
         self.clear_form()
 
-        Application.EVENTS.publish('poll.voted', poll, self._env_user, chosen)
+        await Application.EVENTS.publish('poll.voted', poll, self._env_user, chosen)
 
         return self.msg('msg_poll_voted')
