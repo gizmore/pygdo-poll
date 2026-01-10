@@ -3,6 +3,7 @@ from gdo.base.GDT import GDT
 from gdo.base.Render import Mode
 from gdo.core.GDT_AutoInc import GDT_AutoInc
 from gdo.core.GDT_Creator import GDT_Creator
+from gdo.core.GDT_Text import GDT_Text
 from gdo.core.GDT_UInt import GDT_UInt
 from gdo.date.GDT_Created import GDT_Created
 from gdo.date.GDT_Timestamp import GDT_Timestamp
@@ -19,7 +20,7 @@ class GDO_Poll(GDO):
         return [
             GDT_AutoInc('poll_id'),
             GDT_Title('poll_title').maxlen(192).not_null(),
-            GDT_Message('poll_descr'),
+            GDT_Text('poll_descr'),
             GDT_UInt('poll_max_answers').bytes(1).not_null().initial('1'),
             GDT_UInt('poll_min_answers').bytes(1).not_null().initial('1'),
             GDT_Timestamp('poll_announced'),

@@ -33,3 +33,9 @@ md_poll_vote = "Vote for a poll."
 err_poll_max_chosen = "You may only select up to %d choices."
 err_poll_min_chosen = "You have to select at least %d choices."
 msg_poll_voted = "Your vote has been registered."
+
+########
+# Show #
+########
+mt_poll_show = "Poll"
+md_poll_show = "View a poll on this website."
