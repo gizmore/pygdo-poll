@@ -1,15 +1,11 @@
-from gdo.base.Application import Application
 from gdo.base.IPC import IPC
-from gdo.base.Util import get_module
 from gdo.base.util.href import href
-from gdo.core.GDO_User import GDO_User
 from gdo.core.GDT_Repeat import GDT_Repeat
 from gdo.core.GDT_String import GDT_String
 from gdo.core.GDT_UInt import GDT_UInt
 from gdo.form.GDT_Form import GDT_Form
 from gdo.form.GDT_Submit import GDT_Submit
 from gdo.form.MethodForm import MethodForm
-from gdo.mail.Mail import Mail
 from gdo.message.GDT_Message import GDT_Message
 from gdo.net.GDT_Redirect import GDT_Redirect
 from gdo.ui.GDT_Title import GDT_Title
@@ -18,6 +14,9 @@ from gdo.poll.GDO_PollChoice import GDO_PollChoice
 
 
 class create(MethodForm):
+    """
+    Create a Poll via http or a text connector like Telegram
+    """
 
     @classmethod
     def gdo_trigger(cls) -> str:
@@ -56,5 +55,9 @@ class create(MethodForm):
         self.clear_form()
         self.msg('msg_poll_created')
         # await Application.EVENTS.publish('poll.created', poll)
-        IPC.send('poll.announce', poll.get_id())
+        self.poll = poll
         return GDT_Redirect().href(href('poll', 'vote', f'&poll={poll.get_id()}')).text('You get redirected...')
+
+    def gdo_after_execute(self):
+        if hasattr(self, 'poll'):
+            IPC.send('poll.announce', (self.poll.get_id(),))
