@@ -1,12 +1,9 @@
 module_poll = "Poll"
 poll_sidebar = "Poll: %s (%s)"
-
 question = "Question"
-
 max_answers = "Max Answers"
 choices = "Choices"
-
-poll_outcome = "%s (%s)"
+poll_outcome = "%d) %s (%s)"
 
 ##########
 # Create #
@@ -21,8 +18,8 @@ add_choice = "Add choice"
 ########
 mt_poll_mail = "Mail Poll"
 md_poll_mail = "Cronjob mailing new polls."
-mails_poll_created = "Poll: %s"
-mailb_poll_created = "Hello %s<br/>\nThere is a new poll on %s.<br/>\n<br/>\n%s<br/>\n%s<br/>\n<br/>\n<br/>\nYou can vote via this link:<br/>\n<br/>%s<br/>\n<br/>\nKind Regards<br/>\nThe %2$s System."
+mails_poll_created = "Global Poll: %s"
+mailb_poll_created = "Hello %s<br/>\nThere is a new poll on %s.<br/>\n<br/>\n%s<br/>\n%s<br/>\n<br/>\n<br/>\nYou can vote via these links:<br/>\n<br/>%s<br/>\n<br/>\nKind Regards<br/>\nThe %2$s System."
 
 #############
 # Vote Poll #
@@ -39,3 +36,10 @@ msg_poll_voted = "Your vote has been registered."
 ########
 mt_poll_show = "Poll"
 md_poll_show = "View a poll on this website."
+
+############
+# Announce #
+############
+mt_poll_announce = "Poll Announcer"
+md_poll_announce = "Send poll announcements from IPC. Subscribe channels for poll announcements. Users have a user setting."
+msg_poll_announce = "New Global Poll: %s. Vote with $pv %s 1 2 n…"

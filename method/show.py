@@ -1,8 +1,6 @@
 from gdo.base.GDT import GDT
 from gdo.base.Method import Method
 from gdo.core.GDT_Object import GDT_Object
-from gdo.poll.GDT_PollOutcome import GDT_PollOutcome
-from gdo.ui.GDT_Card import GDT_Card
 from gdo.poll.GDO_Poll import GDO_Poll
 
 
@@ -22,11 +20,4 @@ class show(Method):
 
     def gdo_execute(self) -> GDT:
         poll = self.get_poll()
-        card = GDT_Card().gdo(poll)
-        card.creator_header()
-        card.get_content().add_fields(
-            poll.column('poll_title'),
-            poll.column('poll_descr'),
-            GDT_PollOutcome('poll_outcome').poll(poll),
-        )
-        return card
+        return poll.get_card()

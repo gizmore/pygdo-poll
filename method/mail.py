@@ -27,7 +27,7 @@ class mail(MethodCronjob):
     def gdo_execute(self) -> GDT:
         if self.mod().cfg_email_new_polls():
             if poll := GDO_Poll.table().select().where('poll_announced IS NULL').order('poll_id ASC').first().exec().fetch_object():
-                # poll.save_val('poll_announced', Time.get_date())
+                poll.save_val('poll_announced', Time.get_date())
                 self.mail_poll(poll)
         return self.empty()
 
@@ -35,7 +35,7 @@ class mail(MethodCronjob):
         if self.mod().cfg_email_all_users():
             settings = [('email_confirmed', '=', '1')]
         else:
-            settings = [('email_new_polls', '=', '1'), ('email_confirmed', 'IS NOT', None)]
+            settings = [('email_new_polls', '=', '1'), ('email_confirmed', '=', '1')]
         return GDO_User.table().with_settings_result(settings).nocache()
 
     def mail_poll(self, poll: GDO_Poll):

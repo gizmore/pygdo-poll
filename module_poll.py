@@ -47,7 +47,8 @@ class module_poll(GDO_Module):
 
     def gdo_user_settings(self) -> list[GDT]:
         return [
-            GDT_Bool('email_new_polls').not_null().initial('0'),
+            GDT_Bool('email_polls').not_null().initial('1'),
+            GDT_Bool('msg_polls').not_null().initial('0'),
         ]
 
     def gdo_init_sidebar(self, page: 'GDT_Page'):
@@ -57,6 +58,7 @@ class module_poll(GDO_Module):
         self.add_sidebar_polls(page)
 
     def add_sidebar_polls(self, page):
+        page._right_bar.add_field(GDT_Link().href(self.href('polls')).text('module_polls'))
         polls = self.get_sidebar_polls()
         page._right_bar.add_field(polls)
 

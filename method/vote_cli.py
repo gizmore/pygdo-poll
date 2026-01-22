@@ -13,7 +13,7 @@ class vote_cli(vote):
 
     @classmethod
     def gdo_trig(cls) -> str:
-        return 'pollv'
+        return 'pv'
 
     def gdo_connectors(self) -> str:
         return Connector.text_connectors()
@@ -24,8 +24,8 @@ class vote_cli(vote):
         form.text('%s', (poll.gdo_value('poll_descr'),))
         form.href(self.href(f"&poll={poll.get_id()}"))
         choices = poll.get_choices()
-        form.add_field(GDT_Repeat(GDT_UInt('choose').min(1).max(len(choices))).min(1).max(poll.get_max_choices()))
-        self.create_default_form_elements(form)
+        form.add_field(GDT_Repeat(GDT_UInt('choose').min(1).max(len(choices))).min(poll.get_min_choices()).max(poll.get_max_choices()))
+        super().gdo_create_form(form)
 
     def form_submitted(self):
         poll = self.get_poll()

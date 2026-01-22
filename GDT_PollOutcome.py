@@ -16,6 +16,8 @@ class GDT_PollOutcome(GDT_Bool):
 
     def render_txt(self) -> str:
         out = []
+        i = 1
         for choice in self._poll.get_choices():
-            out.append(t('poll_outcome', (choice.render_title(), choice.render_percent())))
+            out.append(t('poll_outcome', (i, choice.render_title(), choice.render_percent())))
+            i += 1
         return ', '.join(out)

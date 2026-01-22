@@ -11,7 +11,6 @@ from gdo.poll.GDO_Poll import GDO_Poll
 class GDO_PollChoice(GDO):
 
     def gdo_columns(self) -> list[GDT]:
-        from gdo.poll.GDO_PollVote import GDO_PollVote
         return [
             GDT_AutoInc('pc_id'),
             GDT_Object('pc_poll').table(GDO_Poll.table()).not_null().cascade_delete(),

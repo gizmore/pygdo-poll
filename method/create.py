@@ -1,10 +1,15 @@
+from gdo.base.Application import Application
+from gdo.base.IPC import IPC
+from gdo.base.Util import get_module
 from gdo.base.util.href import href
+from gdo.core.GDO_User import GDO_User
 from gdo.core.GDT_Repeat import GDT_Repeat
 from gdo.core.GDT_String import GDT_String
 from gdo.core.GDT_UInt import GDT_UInt
 from gdo.form.GDT_Form import GDT_Form
 from gdo.form.GDT_Submit import GDT_Submit
 from gdo.form.MethodForm import MethodForm
+from gdo.mail.Mail import Mail
 from gdo.message.GDT_Message import GDT_Message
 from gdo.net.GDT_Redirect import GDT_Redirect
 from gdo.ui.GDT_Title import GDT_Title
@@ -36,7 +41,7 @@ class create(MethodForm):
     def add_choice(self):
         pass # all good :)
 
-    def form_submitted(self):
+    async def form_submitted(self):
         poll = GDO_Poll.blank({
             'poll_title': self.param_val('title'),
             'poll_descr': self.param_val('question'),
@@ -50,4 +55,6 @@ class create(MethodForm):
             }).insert()
         self.clear_form()
         self.msg('msg_poll_created')
-        return GDT_Redirect().href(href('poll', 'vote', f'&poll={poll.get_id()}')).text('test')
+        # await Application.EVENTS.publish('poll.created', poll)
+        IPC.send('poll.announce', poll.get_id())
+        return GDT_Redirect().href(href('poll', 'vote', f'&poll={poll.get_id()}')).text('You get redirected...')
