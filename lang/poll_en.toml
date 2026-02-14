@@ -42,4 +42,4 @@ md_poll_show = "View a poll on this website."
 ############
 mt_poll_announce = "Poll Announcer"
 md_poll_announce = "Send poll announcements from IPC. Subscribe channels for poll announcements. Users have a user setting."
-msg_poll_announce = "New Global Poll: %s. Vote with $pv %s 1 2 n…"
+msg_poll_announce = "New Global Poll: %s %s - Vote with $pv %s **1** <n> [<n>]. Choices: %s. Example $pv **%s** 1."

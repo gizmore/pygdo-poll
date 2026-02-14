@@ -29,12 +29,18 @@ class announce(Method):
         return self.param_value('id')
 
     async def gdo_execute(self) -> GDT:
-        if Application.IS_DOG:
+        if Application.IS_DOG or Application.is_unit_test():
             poll = self.get_poll()
+            choice_out = []
+            i = 1
+            for choice in poll.get_choices():
+                choice_out.append(f"{i}) {choice.gdo_val('pc_text')}")
+                i += 1
+            args = (poll.column('poll_descr').render_txt(), poll.column('poll_title').render_txt(), poll.get_id(), ", ".join(choice_out), poll.get_id())
             for channel in GDO_Channel.with_setting(self, 'subscribed', '1', '1'):
                 with Trans(channel.get_lang_iso()):
-                    await channel.send_text('msg_poll_announce', (poll.get_card().render_text(channel.get_render_mode()), poll.get_id()))
+                    await channel.send_text('msg_poll_announce', args)
             for user in GDO_User.table().with_settings_result([('msg_polls', '=', '1')]):
                 with Trans(user.get_setting_val('language')):
-                    await user.send('msg_poll_announce', (poll.get_card().render_text(user.get_server().get_render_mode()), poll.get_id()))
+                    await user.send('msg_poll_announce', args)
         return self.empty()

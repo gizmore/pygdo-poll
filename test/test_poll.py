@@ -1,7 +1,7 @@
-import os
-
 from gdo.base.Application import Application
+import os
 from gdo.base.ModuleLoader import ModuleLoader
+from gdo.core.connector.Bash import Bash
 from gdotest.TestUtil import reinstall_module, text_plug, GDOTestCase, cli_plug, cli_gizmore
 
 
@@ -19,7 +19,9 @@ class PollTestCase(GDOTestCase):
 
     async def test_01_cli_poll(self):
         giz = cli_gizmore()
+        chan = Bash.get_server().get_or_create_channel('test_poll')
         out = cli_plug(giz, '$poll.add --max_answers=2 "Who is major?" "Peter Lustig" "The other guy" "Third option"')
+        self.assertIn('New Global Poll', out, "Poll was not announced.")
         self.assertIn('created', out, "Poll was not created.")
         out = cli_plug(giz, '$poll.vote 1 1 2 3')
         self.assertIn('may not enter more than 2', out, "Poll max vote values are not checked.")
