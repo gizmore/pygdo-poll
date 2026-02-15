@@ -57,7 +57,6 @@ class GDO_Poll(GDO):
     def is_multiple_choice(self) -> bool:
         return self.get_max_choices() > 1
 
-    @lru_cache
     def get_card(self):
         from gdo.poll.GDT_PollOutcome import GDT_PollOutcome
         card = GDT_Card().gdo(self)
@@ -65,6 +64,6 @@ class GDO_Poll(GDO):
         card.get_content().add_fields(
             self.column('poll_title'),
             self.column('poll_descr'),
-            GDT_PollOutcome('poll_outcome').poll(self),
+            GDT_PollOutcome('poll_outcome').gdo(self),
         )
         return card
