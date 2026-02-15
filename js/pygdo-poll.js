@@ -1,0 +1,5 @@
+window.gdo.poll = {
+
+
+
+}

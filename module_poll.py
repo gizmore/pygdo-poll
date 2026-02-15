@@ -1,9 +1,8 @@
-import functools
+from functools import lru_cache
 
 from gdo.base.Application import Application
 from gdo.base.GDO_Module import GDO_Module
 from gdo.base.GDT import GDT
-from gdo.base.util.href import href
 from gdo.core.GDT_Bool import GDT_Bool
 from gdo.core.GDT_Container import GDT_Container
 from gdo.core.GDT_UInt import GDT_UInt
@@ -51,10 +50,11 @@ class module_poll(GDO_Module):
             GDT_Bool('msg_polls').not_null().initial('0'),
         ]
 
+    def gdo_load_scripts(self, page: 'GDT_Page'):
+        self.add_js('js/pygdo-poll.js')
+        self.add_css('css/pygdo-poll.css')
+
     def gdo_init_sidebar(self, page: 'GDT_Page'):
-        page._right_bar.add_field(
-            GDT_Link().href(href('poll', 'create')).text('mt_poll_create'),
-        )
         self.add_sidebar_polls(page)
 
     def add_sidebar_polls(self, page):
@@ -62,7 +62,7 @@ class module_poll(GDO_Module):
         polls = self.get_sidebar_polls()
         page._right_bar.add_field(polls)
 
-    @functools.cache
+    @lru_cache
     def get_sidebar_polls(self) -> GDT:
         cont = GDT_Container()
         cut = Time.get_date(Application.TIME - self.cfg_max_age_side_polls())

@@ -12,7 +12,8 @@ class GDT_PollOutcome(GDT_Bool):
         return self
 
     def render_cell(self) -> str:
-        return GDT_Template.python('poll', 'cell_poll_outcome.html', {'field': self})
+        return self.render_txt()
+        # return GDT_Template.python('poll', 'cell_poll_outcome.html', {'field': self})
 
     def render_txt(self) -> str:
         out = []
