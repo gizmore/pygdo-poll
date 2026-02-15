@@ -1,8 +1,10 @@
 module_poll = "Poll"
+polls = "Polls"
 poll_sidebar = "Poll: %s (%s)"
 question = "Question"
 max_answers = "Max Answers"
 choices = "Choices"
+outcome = "Outcome"
 poll_outcome = "%d) %s (%s)"
 
 ##########
@@ -43,3 +45,9 @@ md_poll_show = "View a poll on this website."
 mt_poll_announce = "Poll Announcer"
 md_poll_announce = "Send poll announcements from IPC. Subscribe channels for poll announcements. Users have a user setting."
 msg_poll_announce = "New Global Poll: %s %s - Vote with $pv %s **1** <n> [<n>]. Choices: %s. Example $pv **%s** 1."
+
+#########
+# Polls #
+#########
+mt_poll_polls = "Poll Overview"
+md_poll_polls = "Poll Overview and poll outcomes."
