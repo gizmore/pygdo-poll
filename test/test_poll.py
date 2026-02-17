@@ -2,8 +2,8 @@ from gdo.base.Application import Application
 import os
 from gdo.base.ModuleLoader import ModuleLoader
 from gdo.core.connector.Bash import Bash
-from gdotest.TestUtil import reinstall_module, text_plug, GDOTestCase, cli_plug, cli_gizmore
-
+from gdotest.TestUtil import reinstall_module, text_plug, GDOTestCase, cli_plug, cli_gizmore, all_private_messages
+import asyncio
 
 class PollTestCase(GDOTestCase):
 
@@ -21,6 +21,8 @@ class PollTestCase(GDOTestCase):
         giz = cli_gizmore()
         chan = Bash.get_server().get_or_create_channel('test_poll')
         out = cli_plug(giz, '$poll.add --max_answers=2 "Who is major?" "Peter Lustig" "The other guy" "Third option"')
+        await asyncio.sleep(0.3141)
+        out += all_private_messages()
         self.assertIn('New Global Poll', out, "Poll was not announced.")
         self.assertIn('created', out, "Poll was not created.")
         out = cli_plug(giz, '$poll.vote 1 1 2 3')
