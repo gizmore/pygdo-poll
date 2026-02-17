@@ -13,11 +13,12 @@ from gdo.poll.GDO_PollChoice import GDO_PollChoice
 from gdo.poll.GDO_PollVote import GDO_PollVote
 from gdo.ui.GDT_Link import GDT_Link
 from gdo.ui.GDT_Page import GDT_Page
+from gdo.base.GDO import GDO
 
 
 class module_poll(GDO_Module):
 
-    def gdo_classes(self):
+    def gdo_classes(self) -> list[type[GDO]]:
         return [
             GDO_Poll,
             GDO_PollChoice,
