@@ -1,4 +1,3 @@
-from gdo.base.Cache import Cache
 from gdo.base.IPC import IPC
 from gdo.base.util.href import href
 from gdo.core.GDT_Repeat import GDT_Repeat
@@ -9,6 +8,7 @@ from gdo.form.GDT_Submit import GDT_Submit
 from gdo.form.MethodForm import MethodForm
 from gdo.message.GDT_Message import GDT_Message
 from gdo.net.GDT_Redirect import GDT_Redirect
+from gdo.poll.module_poll import module_poll
 from gdo.ui.GDT_Title import GDT_Title
 from gdo.poll.GDO_Poll import GDO_Poll
 from gdo.poll.GDO_PollChoice import GDO_PollChoice
@@ -57,7 +57,7 @@ class create(MethodForm):
         self.msg('msg_poll_created')
         # await Application.EVENTS.publish('poll.created', poll)
         self.poll = poll
-        Cache.remove()
+        module_poll.instance().get_sidebar_polls.cache_clear()
         return GDT_Redirect().href(href('poll', 'vote', f'&poll={poll.get_id()}')).text('You get redirected...')
 
     def gdo_after_execute(self):
