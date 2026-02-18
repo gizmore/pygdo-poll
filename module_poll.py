@@ -1,6 +1,7 @@
 from functools import lru_cache
 
 from gdo.base.Application import Application
+from gdo.base.Cache import gdo_cached, gdo_lru_cache
 from gdo.base.GDO_Module import GDO_Module
 from gdo.base.GDT import GDT
 from gdo.core.GDT_Bool import GDT_Bool
@@ -63,9 +64,9 @@ class module_poll(GDO_Module):
         polls = self.get_sidebar_polls()
         page._right_bar.add_field(polls)
 
-    @lru_cache
+    @gdo_lru_cache
     def get_sidebar_polls(self) -> GDT:
-        cont = GDT_Container()
+        cont = GDT_Container().vertical()
         cut = Time.get_date(Application.TIME - self.cfg_max_age_side_polls())
         result = (GDO_Poll.table().select().
                   select('(SELECT COUNT(*) FROM gdo_pollvote LEFT JOIN gdo_pollchoice ON pv_choice=pc_id WHERE pc_poll=poll_id) AS votecount').
