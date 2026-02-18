@@ -21,7 +21,7 @@ class GDO_Poll(GDO):
     def gdo_columns(self) -> list[GDT]:
         return [
             GDT_AutoInc('poll_id'),
-            GDT_Title('poll_title').label('title').maxlen(192).not_null(),
+            GDT_Title('poll_title').maxlen(192).not_null(),
             GDT_Text('poll_descr').label('description'),
             GDT_UInt('poll_min_answers').bytes(1).not_null().initial('1'),
             GDT_UInt('poll_max_answers').bytes(1).not_null().initial('1'),
