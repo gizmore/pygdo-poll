@@ -34,7 +34,7 @@ class create(MethodForm):
             GDT_UInt('min_answers').initial('1').not_null().min(1).max(10),
             GDT_UInt('max_answers').initial('1').not_null().min(1).max(10),
             GDT_Repeat(GDT_String('choices')).min(2).max(10).not_null(),
-            GDT_Submit('add_choice').calling(self.add_choice).label('add_choice'),
+            GDT_Submit('add_choice').calling(self.add_choice).text('add_choice'),
         )
         super().gdo_create_form(form)
 
