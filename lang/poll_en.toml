@@ -21,7 +21,7 @@ add_choice = "Add choice"
 mt_poll_mail = "Mail Poll"
 md_poll_mail = "Cronjob mailing new polls."
 mails_poll_created = "Global Poll: %s"
-mailb_poll_created = "Hello %s<br/>\nThere is a new poll on %s.<br/>\n<br/>\n%s<br/>\n%s<br/>\n<br/>\n<br/>\nYou can vote via these links:<br/>\n<br/>%s<br/>\n<br/>\nKind Regards<br/>\nThe %2$s System."
+mailb_poll_created = "Hello %s<br>\nThere is a new poll on %s.<br>\n<br>\n%s<br>\n%s<br>\n<br>\n<br>\nYou can vote via these links:<br>\n<br>%s<br>\n<br>\nKind Regards<br>\nThe %2$s System."
 
 #############
 # Vote Poll #

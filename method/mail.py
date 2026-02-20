@@ -63,7 +63,7 @@ class mail(MethodCronjob):
             sitename(),
             poll.render_title(),
             poll.render_descr(Mode.render_mail),
-            "<br/>\n".join(links),
+            "<br>\n".join(links),
         )
         mail.subject(t('mails_poll_created', (poll.render_title(),)))
         mail.body(t('mailb_poll_created', args))
