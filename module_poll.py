@@ -1,7 +1,7 @@
 from functools import lru_cache
 
 from gdo.base.Application import Application
-from gdo.base.Cache import gdo_cached, gdo_lru_cache
+from gdo.base.Cache import gdo_redis_cached, gdo_lru_cache
 from gdo.base.GDO_Module import GDO_Module
 from gdo.base.GDT import GDT
 from gdo.core.GDT_Bool import GDT_Bool
