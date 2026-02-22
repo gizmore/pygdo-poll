@@ -6,6 +6,7 @@ max_answers = "Max Answers"
 choices = "Choices"
 outcome = "Outcome"
 poll_outcome = "%d) %s (%s)"
+msg_polls = "Announce polls to you?"
 
 ##########
 # Create #

@@ -2,7 +2,7 @@ from gdo.base.Application import Application
 import os
 from gdo.base.ModuleLoader import ModuleLoader
 from gdo.core.connector.Bash import Bash
-from gdotest.TestUtil import reinstall_module, text_plug, GDOTestCase, cli_plug, cli_gizmore, all_private_messages
+from gdotest.TestUtil import reinstall_module, text_plug, GDOTestCase, cli_plug, cli_gizmore, all_private_messages, install_module
 import asyncio
 
 class PollTestCase(GDOTestCase):
@@ -12,10 +12,13 @@ class PollTestCase(GDOTestCase):
         Application.init(os.path.dirname(__file__ + "/../../../../"))
         Application.init_cli()
         loader = ModuleLoader.instance()
-        reinstall_module('poll')
         loader.load_modules_db(True)
+        install_module('poll')
         loader.init_modules(True, True)
         loader.init_cli()
+
+    async def test_00_reinstall(self):
+        reinstall_module('poll')
 
     async def test_01_cli_poll(self):
         giz = cli_gizmore()

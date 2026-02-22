@@ -46,6 +46,11 @@ class module_poll(GDO_Module):
     def cfg_max_age_side_polls(self) -> int:
         return self.get_config_value('max_age_side_polls')
 
+    def gdo_user_config(self) -> list[GDT]:
+        return [
+            GDT_UInt('effective_poll_vote_power').initial('0'),
+        ]
+
     def gdo_user_settings(self) -> list[GDT]:
         return [
             GDT_Bool('email_polls').not_null().initial('1'),
