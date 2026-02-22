@@ -24,8 +24,10 @@ class polls(MethodQueryTable):
     def gdo_table_headers(self) -> list[GDT]:
         t = self.gdo_table()
         return [
+            t.column('poll_id'),
             t.column('poll_title'),
             GDT_PollOutcome('outcome'),
+            t.column('poll_created'),
         ]
     
     def gdo_execute(self) -> GDT:
