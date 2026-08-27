@@ -7,6 +7,7 @@ choices = "Choices"
 outcome = "Outcome"
 poll_outcome = "%d) %s (%s)"
 msg_polls = "Announce polls to you?"
+email_polls = "Send E-Mail on new poll"
 
 ##########
 # Create #
