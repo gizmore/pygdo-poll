@@ -65,7 +65,7 @@ class module_poll(GDO_Module):
         self.add_sidebar_polls(page)
 
     def add_sidebar_polls(self, page):
-        page._right_bar.add_field(GDT_Link().href(self.href('polls')).text('polls'))
+        page._right_bar.add_field(GDT_Link().href(self.href('polls')).text('polls').icon('vote'))
         polls = self.get_sidebar_polls()
         page._right_bar.add_field(polls)
 

@@ -35,7 +35,7 @@ class mail(MethodCronjob):
         if self.mod().cfg_email_all_users():
             settings = [('email_confirmed', '=', '1')]
         else:
-            settings = [('email_new_polls', '=', '1'), ('email_confirmed', '=', '1')]
+            settings = [('email_polls', '=', '1'), ('email_confirmed', '=', '1')]
         return GDO_User.table().with_settings_result(settings).nocache()
 
     def mail_poll(self, poll: GDO_Poll):
