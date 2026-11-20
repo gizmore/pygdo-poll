@@ -1,4 +1,5 @@
 from functools import lru_cache
+from datetime import datetime, timezone
 
 from gdo.base.GDT import GDT
 from gdo.base.GDO import GDO
@@ -18,6 +19,15 @@ if TYPE_CHECKING:
 
 class GDO_Poll(GDO):
 
+    @classmethod
+    def active_poll(cls):
+        from gdo.date.Time import Time
+        now = Time.get_date()
+        return (cls.table().select().where(
+            f"poll_closed IS NULL AND (poll_starts IS NULL OR poll_starts <= '{now}') "
+            f"AND (poll_expires IS NULL OR poll_expires > '{now}')")
+                .order('poll_id ASC').first().nocache().exec().fetch_object())
+
     def gdo_columns(self) -> list[GDT]:
         return [
             GDT_AutoInc('poll_id'),
@@ -26,7 +36,10 @@ class GDO_Poll(GDO):
             GDT_UInt('poll_min_answers').bytes(1).not_null().initial('1'),
             GDT_UInt('poll_max_answers').bytes(1).not_null().initial('1'),
             GDT_Timestamp('poll_announced'),
+            GDT_Timestamp('poll_broadcasted'),
             GDT_Timestamp('poll_closed'),
+            GDT_Timestamp('poll_starts'),
+            GDT_Timestamp('poll_expires'),
             GDT_Creator('poll_creator'),
             GDT_Created('poll_created'),
         ]
@@ -46,6 +59,7 @@ class GDO_Poll(GDO):
                 select("(SELECT COUNT(*) FROM gdo_pollvote WHERE pv_choice=pc_id) num_votes").
                 select(f"(SELECT COUNT(*) FROM gdo_pollvote JOIN gdo_pollchoice ON pc_id=pv_choice WHERE pc_poll={self.get_id()}) total_votes").
                 where(f"pc_poll={self.get_id()}").
+                order('pc_id ASC').
                 nocache().exec().fetch_all())
 
     def get_min_choices(self) -> int:
@@ -57,13 +71,31 @@ class GDO_Poll(GDO):
     def is_multiple_choice(self) -> bool:
         return self.get_max_choices() > 1
 
+    def is_closed(self) -> bool:
+        from gdo.base.Application import Application
+        expires = self.gdo_val('poll_expires')
+        return bool(self.gdo_val('poll_closed') or (expires and self.utc_timestamp(expires) <= Application.TIME))
+
+    @staticmethod
+    def utc_timestamp(value: str) -> float:
+        return datetime.fromisoformat(value).replace(tzinfo=timezone.utc).timestamp()
+
+    def is_active(self) -> bool:
+        from gdo.base.Application import Application
+        starts = self.gdo_val('poll_starts')
+        return not self.is_closed() and (not starts or self.utc_timestamp(starts) <= Application.TIME)
+
     def get_card(self):
         from gdo.poll.GDT_PollOutcome import GDT_PollOutcome
+        from gdo.base.util.href import href
+        from gdo.ui.GDT_Link import GDT_Link
         card = GDT_Card().gdo(self)
         card.creator_header()
         card.get_content().add_fields(
             self.column('poll_title'),
             self.column('poll_descr'),
-            GDT_PollOutcome('poll_outcome').gdo(self),
+            GDT_PollOutcome('poll_outcome').label('outcome').gdo(self),
         )
+        card.get_footer().add_field(
+            GDT_Link().href(href('poll', 'vote', f'&poll={self.get_id()}')).text('mt_poll_vote'))
         return card

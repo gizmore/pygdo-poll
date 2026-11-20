@@ -54,10 +54,16 @@ class vote(MethodForm):
         uid = self._env_user.get_id()
         poll = self.get_poll()
 
+        if poll.is_closed():
+            return self.err('err_poll_closed')
+        if not poll.is_active():
+            return self.err('err_poll_not_started')
+        if len({choice.get_id() for choice in chosen}) != len(chosen):
+            return self.err('err_poll_duplicate_choice')
         if len(chosen) > poll.get_max_choices():
-            return self.err('err_vote_max_chosen', (poll.get_max_choices(),))
+            return self.err('err_poll_max_chosen', (poll.get_max_choices(),))
         if len(chosen) < poll.get_min_choices():
-            return self.err('err_vote_min_chosen', (poll.get_min_choices(),))
+            return self.err('err_poll_min_chosen', (poll.get_min_choices(),))
 
         # delete old
         result = (GDO_PollVote.table().select().

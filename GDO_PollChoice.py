@@ -23,5 +23,5 @@ class GDO_PollChoice(GDO):
     def render_percent(self) -> str:
         total = int(self._vals['total_votes'])
         if not total:
-            return '?,??%'
+            return '0%'
         return str(round(int(self._vals['num_votes']) / total * 100, 1)) + '%'

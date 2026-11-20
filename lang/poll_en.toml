@@ -3,6 +3,11 @@ polls = "Polls"
 poll_sidebar = "Poll: %s (%s)"
 question = "Question"
 max_answers = "Max Answers"
+duration_days = "Duration in days"
+poll_credits_per_day = "Poll credits per day"
+poll_price_per_day = "Price: %s credits per day, charged when the poll is created."
+poll_expires = "Voting ends"
+poll_starts = "Voting starts"
 choices = "Choices"
 outcome = "Outcome"
 poll_outcome = "%d) %s (%s)"
@@ -16,7 +21,14 @@ effective_poll_vote_power = "Effective poll votes"
 mt_poll_create = "Create Poll"
 md_poll_create = "Create a new Poll and broadcast it."
 msg_poll_created = "Your Poll has been created."
+msg_poll_queued = "Your poll is queued to start at %s UTC."
 add_choice = "Add choice"
+err_poll_answer_bounds = "The minimum must not exceed the maximum, and the maximum must not exceed the number of choices."
+err_poll_insufficient_credits = "Creating this poll requires %s credits."
+err_poll_closed = "This poll is closed."
+err_poll_not_started = "This poll has not started yet."
+err_poll_no_active = "There is no active poll."
+err_poll_legacy_unscheduled = "An older open poll has no end time; close or schedule it before adding another poll."
 
 ########
 # Mail #
@@ -34,6 +46,7 @@ mt_poll_vote = "Vote Poll"
 md_poll_vote = "Vote for a poll."
 err_poll_max_chosen = "You may only select up to %d choices."
 err_poll_min_chosen = "You have to select at least %d choices."
+err_poll_duplicate_choice = "You cannot select the same choice more than once."
 msg_poll_voted = "Your vote has been registered."
 
 ########
@@ -47,7 +60,7 @@ md_poll_show = "View a poll on this website."
 ############
 mt_poll_announce = "Poll Announcer"
 md_poll_announce = "Send poll announcements from IPC. Subscribe channels for poll announcements. Users have a user setting."
-msg_poll_announce = "New Global Poll: %s %s - Vote with $pv %s **1** <n> [<n>]. Choices: %s. Example $pv **%s** 1."
+msg_poll_announce = "New Global Poll: %s %s - Vote with $pv <n> [<n>]. Poll %s choices: %s. Example: $pv 1. (Poll %s)"
 
 #########
 # Polls #

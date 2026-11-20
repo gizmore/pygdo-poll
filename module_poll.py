@@ -32,6 +32,7 @@ class module_poll(GDO_Module):
             GDT_Bool('email_all_users').not_null().initial('0'),
             GDT_UInt('max_side_polls').not_null().initial('3'),
             GDT_Duration('max_age_side_polls').not_null().initial('1w'),
+            GDT_UInt('poll_credits_per_day').not_null().initial('0'),
         ]
 
     def cfg_email_new_polls(self) -> bool:
@@ -60,6 +61,22 @@ class module_poll(GDO_Module):
     def gdo_load_scripts(self, page: 'GDT_Page'):
         self.add_js('js/pygdo-poll.js')
         self.add_css('css/pygdo-poll.css')
+
+    def gdo_subscribe_events(self):
+        Application.EVENTS.add_timer_async(10, self.announce_active_poll, Application.EVENTS.FOREVER)
+
+    async def announce_active_poll(self):
+        if not Application.IS_DOG:
+            return
+        now = Time.get_date()
+        poll = (GDO_Poll.table().select().where(
+            f"poll_broadcasted IS NULL AND poll_starts <= '{now}' "
+            f"AND poll_expires > '{now}' AND poll_closed IS NULL")
+                .order('poll_starts ASC').first().nocache().exec().fetch_object())
+        if poll:
+            from gdo.base.IPC import IPC
+            await IPC.execute_dog_event('poll.announce', (poll.get_id(),))
+            poll.save_val('poll_broadcasted', now)
 
     def gdo_init_sidebar(self, page: 'GDT_Page'):
         self.add_sidebar_polls(page)

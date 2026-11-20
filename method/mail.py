@@ -26,7 +26,11 @@ class mail(MethodCronjob):
 
     def gdo_execute(self) -> GDT:
         if self.mod().cfg_email_new_polls():
-            if poll := GDO_Poll.table().select().where('poll_announced IS NULL').order('poll_id ASC').first().exec().fetch_object():
+            now = Time.get_date()
+            if poll := GDO_Poll.table().select().where(
+                f"poll_announced IS NULL AND (poll_starts IS NULL OR poll_starts <= '{now}') "
+                f"AND (poll_expires IS NULL OR poll_expires > '{now}') AND poll_closed IS NULL"
+            ).order('poll_id ASC').first().exec().fetch_object():
                 poll.save_val('poll_announced', Time.get_date())
                 self.mail_poll(poll)
         return self.empty()
