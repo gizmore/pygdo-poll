@@ -170,6 +170,7 @@ class PollLimitTest(unittest.IsolatedAsyncioTestCase):
         from gdo.poll.GDT_PollOutcome import GDT_PollOutcome
         poll = MagicMock()
         poll.get_id.return_value = '1'
+        poll.is_closed.return_value = True
         choice = MagicMock()
         choice.render_title.return_value = '<Option>'
         choice.render_percent.return_value = '50%'
@@ -181,11 +182,41 @@ class PollLimitTest(unittest.IsolatedAsyncioTestCase):
             self.assertIn('&lt;Option&gt;', outcome.render_card())
             self.assertEqual('1) <Option> (50%)', outcome.render_irc())
 
+    def test_results_hidden_for_open_and_queued_polls_in_all_modes(self):
+        from gdo.poll.GDT_PollOutcome import GDT_PollOutcome
+        poll = MagicMock()
+        poll.get_id.return_value = '1'
+        poll.is_closed.return_value = False
+        with patch('gdo.core.GDT_String.t', side_effect=lambda key, *args: key), \
+             patch('gdo.ui.WithIcon.t', side_effect=lambda key, *args: key), \
+             patch('gdo.poll.GDT_PollOutcome.t', return_value='Hidden'):
+            outcome = GDT_PollOutcome('outcome').poll(poll)
+            for render in (outcome.render_html, outcome.render_cell, outcome.render_card,
+                           outcome.render_txt, outcome.render_irc, outcome.render_json):
+                self.assertEqual('Hidden', render())
+        poll.get_choices.assert_not_called()
+
+    def test_poll_overview_includes_full_expiry_timestamp(self):
+        from gdo.date.GDT_Timestamp import GDT_Timestamp
+        from gdo.date.Time import Time
+        from gdo.poll.method.polls import polls
+        with patch('gdo.ui.WithIcon.t', side_effect=lambda key: key):
+            expiry = GDT_Timestamp('poll_expires')
+            table = MagicMock()
+            table.column.side_effect = lambda name: expiry if name == 'poll_expires' else MagicMock()
+            method = polls.__new__(polls)
+            method.gdo_table = MagicMock(return_value=table)
+            headers = method.gdo_table_headers()
+        self.assertEqual('poll_expires', headers[-1].get_name())
+        self.assertEqual(Time.FMT_LONG, headers[-1]._date_format)
+        self.assertNotEqual(Time.FMT_LONG, expiry._date_format)
+
     async def test_failed_announcement_is_not_marked_as_sent(self):
         from gdo.poll.module_poll import module_poll
         module = module_poll()
         poll = MagicMock()
         with patch('gdo.poll.module_poll.Application.IS_DOG', True), \
+             patch.object(module, 'start_next_poll_if_idle'), \
              patch('gdo.poll.module_poll.GDO_Poll') as model, \
              patch('gdo.base.IPC.IPC.execute_dog_event', new_callable=AsyncMock,
                    side_effect=RuntimeError('delivery failed')):

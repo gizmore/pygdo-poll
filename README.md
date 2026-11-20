@@ -23,9 +23,14 @@ announcements also wait until the start. Restart Dog and migrate the module
 schema when deploying the new fields.
 
 HTTP users vote on a specific poll; text users vote on the active poll with
-`$poll.vote <choice> [<choice>...]` (or `$pv`). Choices use stable ID order.
+`$poll <choice> [<choice>...]` (or `$pv`), using spaces for multiple choices.
+The actual command prefix is the channel or server trigger. Choices use stable ID order.
 Queued and expired polls cannot receive votes. Outcomes render as HTML lists
-and as numbered text for connectors.
+and as numbered text for connectors only after the poll ends; active and
+queued polls hide results and the sidebar does not show vote totals.
+Administrators can end the current poll early using `$poll.end --force=1`.
+Votes remain available. The Dog timer moves the waiting queue forward when
+no poll is active, preserving paid durations and order; there is no refund.
 
 Open design: public and effective/team polls are not yet distinguished or
 weighted. Define who can create each kind and whether vote power is captured

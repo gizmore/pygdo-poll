@@ -36,11 +36,13 @@ class announce(Method):
             for choice in poll.get_choices():
                 choice_out.append(f"{i}) {choice.gdo_val('pc_text')}")
                 i += 1
-            args = (poll.column('poll_descr').render_txt(), poll.column('poll_title').render_txt(), poll.get_id(), ", ".join(choice_out), poll.get_id())
+            title = poll.column('poll_title').render_txt()
+            choices = ", ".join(choice_out)
+            example = '1 2' if poll.is_multiple_choice() else '1'
             for channel in GDO_Channel.with_setting(self, 'subscribed', '1', '1'):
                 with Trans(channel.get_lang_iso()):
-                    await channel.send_text('msg_poll_announce', args)
+                    await channel.send_text('msg_poll_announce', (title, choices, channel.get_trigger(), example))
             for user in GDO_User.table().with_settings_result([('msg_polls', '=', '1')]):
                 with Trans(user.get_setting_val('language')):
-                    await user.send('msg_poll_announce', args)
+                    await user.send('msg_poll_announce', (title, choices, user.get_server().get_trigger(), example))
         return self.empty()

@@ -1,12 +1,14 @@
 module_poll = "Poll"
 polls = "Polls"
 poll_sidebar = "Poll: %s (%s)"
+poll_sidebar_title = "Poll: %s"
+poll_results_hidden = "Results are hidden until the poll ends."
 question = "Question"
 max_answers = "Max Answers"
 duration_days = "Duration in days"
 poll_credits_per_day = "Poll credits per day"
 poll_price_per_day = "Price: %s credits per day, charged when the poll is created."
-poll_expires = "Voting ends"
+poll_expires = "Will expire at"
 poll_starts = "Voting starts"
 choices = "Choices"
 outcome = "Outcome"
@@ -28,6 +30,10 @@ err_poll_insufficient_credits = "Creating this poll requires %s credits."
 err_poll_closed = "This poll is closed."
 err_poll_not_started = "This poll has not started yet."
 err_poll_no_active = "There is no active poll."
+err_poll_end_force = "Pass --force=1 to end the active poll."
+msg_poll_ended = "The active poll has been ended: %s"
+mt_poll_end = "End active poll"
+md_poll_end = "Administrators can end the active poll with --force=1. The next queued poll starts when the Dog timer checks."
 err_poll_legacy_unscheduled = "An older open poll has no end time; close or schedule it before adding another poll."
 
 ########
@@ -60,7 +66,7 @@ md_poll_show = "View a poll on this website."
 ############
 mt_poll_announce = "Poll Announcer"
 md_poll_announce = "Send poll announcements from IPC. Subscribe channels for poll announcements. Users have a user setting."
-msg_poll_announce = "New Global Poll: %s %s - Vote with $pv <n> [<n>]. Poll %s choices: %s. Example: $pv 1. (Poll %s)"
+msg_poll_announce = "New Global Poll: %s. Choices: %s. Vote with %spoll %s."
 
 #########
 # Polls #

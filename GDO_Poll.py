@@ -55,12 +55,11 @@ class GDO_Poll(GDO):
 
     def get_choices(self) -> list['GDO_PollChoice']:
         from gdo.poll.GDO_PollChoice import GDO_PollChoice
-        return (GDO_PollChoice.table().select().
-                select("(SELECT COUNT(*) FROM gdo_pollvote WHERE pv_choice=pc_id) num_votes").
-                select(f"(SELECT COUNT(*) FROM gdo_pollvote JOIN gdo_pollchoice ON pc_id=pv_choice WHERE pc_poll={self.get_id()}) total_votes").
-                where(f"pc_poll={self.get_id()}").
-                order('pc_id ASC').
-                nocache().exec().fetch_all())
+        query = GDO_PollChoice.table().select()
+        if self.is_closed():
+            query.select("(SELECT COUNT(*) FROM gdo_pollvote WHERE pv_choice=pc_id) num_votes")
+            query.select(f"(SELECT COUNT(*) FROM gdo_pollvote JOIN gdo_pollchoice ON pc_id=pv_choice WHERE pc_poll={self.get_id()}) total_votes")
+        return query.where(f"pc_poll={self.get_id()}").order('pc_id ASC').nocache().exec().fetch_all()
 
     def get_min_choices(self) -> int:
         return self.gdo_value('poll_min_answers')

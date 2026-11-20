@@ -5,6 +5,7 @@ from gdo.base.GDT import GDT
 from gdo.base.Render import Mode
 from gdo.base.util.href import href
 from gdo.core.GDT_Container import GDT_Container
+from gdo.date.Time import Time
 from gdo.poll.GDO_Poll import GDO_Poll
 from gdo.poll.GDT_PollOutcome import GDT_PollOutcome
 from gdo.table.MethodQueryTable import MethodQueryTable
@@ -28,6 +29,7 @@ class polls(MethodQueryTable):
             t.column('poll_title'),
             GDT_PollOutcome('outcome'),
             t.column('poll_created'),
+            t.column('poll_expires').copy_as().date_format(Time.FMT_LONG),
         ]
     
     def gdo_execute(self) -> GDT:

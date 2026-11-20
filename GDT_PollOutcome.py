@@ -22,6 +22,8 @@ class GDT_PollOutcome(GDT_Bool):
     def render_html(self) -> str:
         if not self._poll.get_id():
             return ''
+        if not self._poll.is_closed():
+            return escape(t('poll_results_hidden'))
         items = ''.join(
             f'<li>{escape(choice.render_title())}: {escape(choice.render_percent())}</li>'
             for choice in self._poll.get_choices()
@@ -43,6 +45,8 @@ class GDT_PollOutcome(GDT_Bool):
     def render_txt(self) -> str:
         out = []
         if self._poll.get_id():
+            if not self._poll.is_closed():
+                return t('poll_results_hidden')
             i = 1
             for choice in self._poll.get_choices():
                 out.append(t('poll_outcome', (i, choice.render_title(), choice.render_percent())))

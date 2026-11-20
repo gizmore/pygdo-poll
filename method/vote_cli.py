@@ -12,7 +12,7 @@ class vote_cli(vote):
 
     @classmethod
     def gdo_trigger(cls) -> str:
-        return 'poll.vote'
+        return 'poll'
 
     @classmethod
     def gdo_trig(cls) -> str:

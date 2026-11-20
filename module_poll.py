@@ -68,6 +68,7 @@ class module_poll(GDO_Module):
     async def announce_active_poll(self):
         if not Application.IS_DOG:
             return
+        self.start_next_poll_if_idle()
         now = Time.get_date()
         poll = (GDO_Poll.table().select().where(
             f"poll_broadcasted IS NULL AND poll_starts <= '{now}' "
@@ -77,6 +78,34 @@ class module_poll(GDO_Module):
             from gdo.base.IPC import IPC
             await IPC.execute_dog_event('poll.announce', (poll.get_id(),))
             poll.save_val('poll_broadcasted', now)
+
+    def start_next_poll_if_idle(self):
+        """Move the waiting schedule forward when no poll is currently active."""
+        db = Application.db()
+        db.begin()
+        try:
+            db.select("SELECT module_id FROM gdo_module WHERE module_name = 'poll' FOR UPDATE").fetch_row()
+            if GDO_Poll.active_poll():
+                db.commit()
+                return
+            now = Time.get_date()
+            next_poll = (GDO_Poll.table().select().where(
+                f"poll_closed IS NULL AND poll_starts > '{now}' AND poll_expires IS NOT NULL")
+                .order('poll_starts ASC, poll_id ASC').first().nocache().exec().fetch_object())
+            if next_poll:
+                starts = next_poll.gdo_val('poll_starts')
+                delta = int(GDO_Poll.utc_timestamp(starts) - GDO_Poll.utc_timestamp(now))
+                # Move the entire remaining queue together, keeping paid durations and ordering.
+                db.query("UPDATE gdo_poll SET "
+                         f"poll_starts = DATE_SUB(poll_starts, INTERVAL {delta} SECOND), "
+                         f"poll_expires = DATE_SUB(poll_expires, INTERVAL {delta} SECOND) "
+                         f"WHERE poll_closed IS NULL AND poll_starts >= '{starts}' "
+                         "AND poll_expires IS NOT NULL")
+                self.get_sidebar_polls.cache_clear()
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise
 
     def gdo_init_sidebar(self, page: 'GDT_Page'):
         self.add_sidebar_polls(page)
@@ -91,7 +120,6 @@ class module_poll(GDO_Module):
         cont = GDT_Container().vertical()
         cut = Time.get_date(Application.TIME - self.cfg_max_age_side_polls())
         result = (GDO_Poll.table().select().
-                  select('(SELECT COUNT(*) FROM gdo_pollvote LEFT JOIN gdo_pollchoice ON pv_choice=pc_id WHERE pc_poll=poll_id) AS votecount').
                   order('poll_created DESC').
                   limit(self.cfg_max_side_polls()).
                   where(f"poll_created >= '{cut}'").
@@ -99,5 +127,5 @@ class module_poll(GDO_Module):
         for poll in result:
             cont.add_field(
                 GDT_Link().href(self.href('show', f"&poll={poll.get_id()}")).
-                text('poll_sidebar', (poll.gdo_val('poll_title'), poll._vals['votecount'])))
+                text('poll_sidebar_title', (poll.gdo_val('poll_title'),)))
         return cont

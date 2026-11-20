@@ -8,7 +8,7 @@ class show(Method):
 
     @classmethod
     def gdo_trigger(cls) -> str:
-        return 'poll'
+        return ''
 
     def gdo_parameters(self) -> list[GDT]:
         return [
