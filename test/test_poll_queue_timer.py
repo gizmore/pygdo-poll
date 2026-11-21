@@ -36,6 +36,16 @@ class PollQueueTimerTest(unittest.TestCase):
 
 
 class PollAnnouncementTest(unittest.IsolatedAsyncioTestCase):
+    def test_announcement_is_configurable_but_protected(self):
+        from gdo.core.GDO_Permission import GDO_Permission
+        from gdo.poll.method.announce import announce
+        self.assertEqual('poll.announce', announce.gdo_trigger())
+        method = announce.__new__(announce)
+        self.assertEqual(GDO_Permission.CRONJOB, method.gdo_user_permission())
+        self.assertTrue(method.gdo_method_hidden())
+        with patch('gdo.base.Application.Application.get_mode', return_value=None):
+            self.assertEqual('1', method.gdo_method_config_channel()[0]._initial)
+
     async def test_announcement_uses_channel_trigger_and_multiple_choice_example(self):
         from gdo.poll.method.announce import announce
         method = announce.__new__(announce)

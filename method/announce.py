@@ -3,6 +3,7 @@ from gdo.base.GDT import GDT
 from gdo.base.Method import Method
 from gdo.base.Trans import tiso, Trans
 from gdo.core.GDO_Channel import GDO_Channel
+from gdo.core.GDO_Permission import GDO_Permission
 from gdo.core.GDO_User import GDO_User
 from gdo.core.GDT_Bool import GDT_Bool
 from gdo.core.GDT_Object import GDT_Object
@@ -13,7 +14,15 @@ class announce(Method):
 
     @classmethod
     def gdo_trigger(cls) -> str:
-        return ''
+        return 'poll.announce'
+
+    def gdo_method_hidden(self) -> bool:
+        return True
+
+    def gdo_user_permission(self) -> str:
+        # The trigger must be registered for channel configuration, but
+        # arbitrary users must not be able to rebroadcast polls.
+        return GDO_Permission.CRONJOB
 
     def gdo_parameters(self) -> list[GDT]:
         return [
