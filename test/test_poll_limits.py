@@ -6,6 +6,44 @@ from gdo.poll.method.vote import vote
 
 
 class PollLimitTest(unittest.IsolatedAsyncioTestCase):
+    async def test_revote_replaces_previous_choices(self):
+        method = vote.__new__(vote)
+        method._env_user = MagicMock()
+        method._env_user.get_id.return_value = '42'
+        poll = MagicMock()
+        poll.get_id.return_value = '9'
+        poll.is_closed.return_value = False
+        poll.is_active.return_value = True
+        poll.get_min_choices.return_value = 1
+        poll.get_max_choices.return_value = 2
+        method.get_poll = MagicMock(return_value=poll)
+        method.clear_form = MagicMock()
+        method.msg = MagicMock(return_value='voted')
+        old_votes = [MagicMock(), MagicMock()]
+        new_choice = MagicMock()
+        new_choice.get_id.return_value = '7'
+        with patch('gdo.poll.method.vote.GDO_PollVote') as model, \
+             patch('gdo.poll.method.vote.Application.EVENTS', create=True) as events:
+            model.table.return_value.select.return_value.join_object.return_value.where.return_value.exec.return_value = old_votes
+            events.publish = AsyncMock()
+            self.assertEqual('voted', await method.chosen_submitted([new_choice]))
+        for old in old_votes:
+            old.delete.assert_called_once()
+        model.blank.assert_called_once_with({'pv_user': '42', 'pv_choice': '7'})
+        model.blank.return_value.insert.assert_called_once()
+
+    async def test_closed_poll_revote_preserves_previous_vote(self):
+        method = vote.__new__(vote)
+        method._env_user = MagicMock()
+        method.get_poll = MagicMock()
+        method.get_poll.return_value.is_closed.return_value = True
+        method.err = MagicMock(return_value='closed')
+        with patch('gdo.poll.method.vote.GDO_PollVote') as model:
+            self.assertEqual('closed', await method.chosen_submitted([MagicMock()]))
+        method.err.assert_called_once_with('err_poll_closed')
+        model.table.assert_not_called()
+        model.blank.assert_not_called()
+
     async def test_create_persists_minimum(self):
         method = create.__new__(create)
         method.param_value = MagicMock(side_effect=lambda key: {
