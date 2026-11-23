@@ -68,6 +68,7 @@ class module_poll(GDO_Module):
     async def announce_active_poll(self):
         if not Application.IS_DOG:
             return
+        await self.announce_ended_polls()
         self.start_next_poll_if_idle()
         now = Time.get_date()
         poll = (GDO_Poll.table().select().where(
@@ -78,6 +79,21 @@ class module_poll(GDO_Module):
             from gdo.base.IPC import IPC
             await IPC.execute_dog_event('poll.announce', (poll.get_id(),))
             poll.save_val('poll_broadcasted', now)
+
+    async def announce_ended_polls(self):
+        """Claim end notices once before sending, avoiding repeated floods."""
+        from gdo.base.IPC import IPC
+        now = Time.get_date()
+        poll = (GDO_Poll.table().select().where(
+            f"poll_end_pending=1 AND (poll_closed IS NOT NULL OR poll_expires <= '{now}')")
+                .order('poll_id ASC').first().nocache().exec().fetch_object())
+        if not poll:
+            return
+        poll_id = int(poll.get_id())
+        result = Application.db().query(
+            f'UPDATE gdo_poll SET poll_end_pending=0 WHERE poll_id={poll_id} AND poll_end_pending=1')
+        if result.rowcount == 1:
+            await IPC.execute_dog_event('poll.announce_end', (str(poll_id),))
 
     def start_next_poll_if_idle(self):
         """Move the waiting schedule forward when no poll is currently active."""

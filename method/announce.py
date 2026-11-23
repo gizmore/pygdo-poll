@@ -30,6 +30,7 @@ class announce(Method):
             GDT_Object('id').table(GDO_Poll.table()).not_null(),
         ]
 
+    @classmethod
     def gdo_method_config_channel(cls) -> list[GDT]:
         return [
             GDT_Bool('subscribed').initial('1').not_null(),

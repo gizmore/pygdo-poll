@@ -57,6 +57,7 @@ class PollAnnouncementTest(unittest.IsolatedAsyncioTestCase):
         users[0].send.side_effect = RuntimeError('secret token')
         module = module_poll()
         module.start_next_poll_if_idle = MagicMock()
+        module.announce_ended_polls = AsyncMock()
 
         async def broadcast(*args):
             await method.gdo_execute()

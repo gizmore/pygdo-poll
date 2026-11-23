@@ -1,4 +1,7 @@
+from html import escape
+
 from gdo.base.GDT import GDT
+from gdo.base.Logger import Logger
 from gdo.base.Render import Mode
 from gdo.base.Result import Result
 from gdo.base.Trans import Trans, sitename, t
@@ -45,7 +48,24 @@ class mail(MethodCronjob):
     def mail_poll(self, poll: GDO_Poll):
         choices = poll.get_choices()
         for user in self.get_users():
-            self.mail_poll_to_user(poll, choices, user)
+            try:
+                self.mail_poll_to_user(poll, choices, user)
+            except Exception as error:
+                Logger.error(f'Poll mail delivery failed ({type(error).__name__}).')
+
+    def mail_results(self, poll: GDO_Poll, results: str):
+        if not self.mod().cfg_email_new_polls():
+            return
+        for user in self.get_users():
+            try:
+                with Trans(user.get_lang_iso()):
+                    message = Mail.from_bot()
+                    message.subject(t('mails_poll_ended', (poll.render_title(),)))
+                    message.body(t('mailb_poll_ended', (escape(user.render_name()), escape(poll.render_title()),
+                                                       escape(results), escape(url('poll', 'show', f'&poll={poll.get_id()}'), quote=True))))
+                    message.send_to_user(user)
+            except Exception as error:
+                Logger.error(f'Poll result mail delivery failed ({type(error).__name__}).')
 
     def mail_poll_to_user(self, poll: GDO_Poll, choices: list[GDO_PollChoice], user: GDO_User):
         with Trans(user.get_lang_iso()):
@@ -56,12 +76,12 @@ class mail(MethodCronjob):
         links = []
         token = vote().create_autologin_token(user.get_id())
         if poll.is_multiple_choice():
-            link = GDT_Link().href(url('poll', 'vote', f"&poll={poll.get_id()}&_auth={token}"))
-            links.append(link.render_mail())
+            link = GDT_Link().href(url('poll', 'vote', f"&poll={poll.get_id()}&_auth={token}")).text('mt_poll_vote')
+            links.append(link.render_html())
         else:
             for i, choice in enumerate(choices, 1):
-                link = GDT_Link().href(url('poll', 'vote', f"&poll={poll.get_id()}&pc{i}=1&_auth={token}"))
-                links.append(link.render_mail())
+                link = GDT_Link().href(url('poll', 'vote', f"&poll={poll.get_id()}&pc{i}=1&_auth={token}")).text_raw(choice.render_title())
+                links.append(link.render_html())
         args = (
             user.render_name(),
             sitename(),

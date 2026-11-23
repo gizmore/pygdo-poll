@@ -85,6 +85,7 @@ class create(MethodForm):
             'poll_descr': self.param_val('question'),
             'poll_min_answers': self.param_val('min_answers'),
             'poll_max_answers': self.param_val('max_answers'),
+            'poll_end_pending': '1',
             'poll_starts': Time.get_date(starts),
             'poll_expires': Time.get_date(starts + days * Time.ONE_DAY),
         }).insert()

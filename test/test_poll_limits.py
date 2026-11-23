@@ -249,12 +249,38 @@ class PollLimitTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(Time.FMT_LONG, headers[-1]._date_format)
         self.assertNotEqual(Time.FMT_LONG, expiry._date_format)
 
+    def test_poll_overview_adds_countdown_and_respects_early_close(self):
+        from gdo.poll.method.polls import polls
+        method = polls.__new__(polls)
+        field = MagicMock()
+        field.render.return_value = '23 Nov 2026'
+        poll = MagicMock()
+        poll.is_closed.return_value = False
+        poll.gdo_val.return_value = '2026-11-23 12:00:00'
+        zone = MagicMock()
+        zone.gdo_val.return_value = 'Europe/Berlin'
+        with patch('gdo.poll.method.polls.t', return_value='Ended'), \
+             patch('gdo.poll.method.polls.GDO_User.current') as current, \
+             patch('gdo.poll.method.polls.Application.get_lang_iso', return_value='en'), \
+             patch('gdo.base.Application.Application.get_mode', return_value=None), \
+             patch('gdo.date.GDT_Duration.Time.human_duration', return_value='2h'), \
+             patch('gdo.poll.method.polls.Time.display_datetime_iso', return_value='23 Nov 2026') as display:
+            current.return_value.get_effective_user.return_value.get_setting_value.return_value = zone
+            result = method.render_poll_expires(field, poll)
+            self.assertIn('23 Nov 2026', result)
+            self.assertEqual(13, display.call_args.args[1].hour)
+            self.assertIn('class="gdt-duration-countdown"', result)
+            self.assertIn('data-countdown-until=', result)
+            poll.is_closed.return_value = True
+            self.assertEqual('Ended', method.render_poll_expires(field, poll))
+
     async def test_failed_announcement_is_not_marked_as_sent(self):
         from gdo.poll.module_poll import module_poll
         module = module_poll()
         poll = MagicMock()
         with patch('gdo.poll.module_poll.Application.IS_DOG', True), \
              patch.object(module, 'start_next_poll_if_idle'), \
+             patch.object(module, 'announce_ended_polls', new_callable=AsyncMock), \
              patch('gdo.poll.module_poll.GDO_Poll') as model, \
              patch('gdo.base.IPC.IPC.execute_dog_event', new_callable=AsyncMock,
                    side_effect=RuntimeError('delivery failed')):

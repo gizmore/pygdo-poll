@@ -5,6 +5,7 @@ from gdo.base.GDT import GDT
 from gdo.base.GDO import GDO
 from gdo.base.Render import Mode
 from gdo.core.GDT_AutoInc import GDT_AutoInc
+from gdo.core.GDT_Bool import GDT_Bool
 from gdo.core.GDT_Creator import GDT_Creator
 from gdo.core.GDT_Text import GDT_Text
 from gdo.core.GDT_UInt import GDT_UInt
@@ -37,6 +38,7 @@ class GDO_Poll(GDO):
             GDT_UInt('poll_max_answers').bytes(1).not_null().initial('1'),
             GDT_Timestamp('poll_announced'),
             GDT_Timestamp('poll_broadcasted'),
+            GDT_Bool('poll_end_pending').not_null().initial('0'),
             GDT_Timestamp('poll_closed'),
             GDT_Timestamp('poll_starts'),
             GDT_Timestamp('poll_expires'),

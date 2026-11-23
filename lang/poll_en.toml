@@ -9,6 +9,7 @@ duration_days = "Duration in days"
 poll_credits_per_day = "Poll credits per day"
 poll_price_per_day = "Price: %s credits per day, charged when the poll is created."
 poll_expires = "Will expire at"
+poll_countdown_ended = "Ended"
 poll_starts = "Voting starts"
 choices = "Choices"
 outcome = "Outcome"
@@ -42,7 +43,7 @@ err_poll_legacy_unscheduled = "An older open poll has no end time; close or sche
 mt_poll_mail = "Mail Poll"
 md_poll_mail = "Cronjob mailing new polls."
 mails_poll_created = "Global Poll: %s"
-mailb_poll_created = "Hello %s<br>\nThere is a new poll on %s.<br>\n<br>\n%s<br>\n%s<br>\n<br>\n<br>\nYou can vote via these links:<br>\n<br>%s<br>\n<br>\nKind Regards<br>\nThe %2$s System."
+mailb_poll_created = "Hello %s<br>\nThere is a new poll on %s.<br>\n<br>\n%s<br>\n%s<br>\n<br>\nOpen a link and submit the form to vote:<br>\n<br>%s<br>\n<br>\nKind Regards<br>\nThe %2$s System."
 
 #############
 # Vote Poll #
@@ -67,6 +68,9 @@ md_poll_show = "View a poll on this website."
 mt_poll_announce = "Poll Announcer"
 md_poll_announce = "Send poll announcements from IPC. Subscribe channels for poll announcements. Users have a user setting."
 msg_poll_announce = "New Global Poll: %s. Choices: %s. Vote with %spoll %s."
+msg_poll_end_announce = "Poll ended: %s. Results: %s."
+mails_poll_ended = "Poll ended: %s"
+mailb_poll_ended = "Hello %s,<br>The poll %s has ended.<br>Results: %s<br>View: %s"
 
 #########
 # Polls #

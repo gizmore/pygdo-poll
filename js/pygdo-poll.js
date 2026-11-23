@@ -1,5 +1,1 @@
-window.gdo.poll = {
-
-
-
-}
+window.gdo.poll = {};

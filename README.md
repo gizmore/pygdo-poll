@@ -32,6 +32,13 @@ Administrators can end the current poll early using `$poll.end --force=1`.
 Votes remain available. The Dog timer moves the waiting queue forward when
 no poll is active, preserving paid durations and order; there is no refund.
 
+End notices are best effort and claimed before delivery (at most once; a crash
+after the claim can lose a notice). They use the existing channel and personal
+poll announcement subscriptions; result mail uses the same email settings as
+new poll mail. Migrate the schema to add `poll_end_pending` before deploying.
+Existing polls default to 0 to avoid announcing historical results; an admin
+must explicitly opt any existing open poll into end notices after migration.
+
 Open design: public and effective/team polls are not yet distinguished or
 weighted. Define who can create each kind and whether vote power is captured
 at voting time before implementing that distinction. Existing announcements
