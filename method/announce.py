@@ -1,5 +1,6 @@
 from gdo.base.Application import Application
 from gdo.base.GDT import GDT
+from gdo.base.Logger import Logger
 from gdo.base.Method import Method
 from gdo.base.Trans import tiso, Trans
 from gdo.core.GDO_Channel import GDO_Channel
@@ -49,9 +50,15 @@ class announce(Method):
             choices = ", ".join(choice_out)
             example = '1 2' if poll.is_multiple_choice() else '1'
             for channel in GDO_Channel.with_setting(self, 'subscribed', '1', '1'):
-                with Trans(channel.get_lang_iso()):
-                    await channel.send_text('msg_poll_announce', (title, choices, channel.get_trigger(), example))
+                try:
+                    with Trans(channel.get_lang_iso()):
+                        await channel.send_text('msg_poll_announce', (title, choices, channel.get_trigger(), example))
+                except Exception as error:
+                    Logger.error(f'Poll announcement channel delivery failed ({type(error).__name__}).')
             for user in GDO_User.table().with_settings_result([('msg_polls', '=', '1')]):
-                with Trans(user.get_setting_val('language')):
-                    await user.send('msg_poll_announce', (title, choices, user.get_server().get_trigger(), example))
+                try:
+                    with Trans(user.get_setting_val('language')):
+                        await user.send('msg_poll_announce', (title, choices, user.get_server().get_trigger(), example))
+                except Exception as error:
+                    Logger.error(f'Poll announcement user delivery failed ({type(error).__name__}).')
         return self.empty()

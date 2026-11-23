@@ -36,6 +36,53 @@ class PollQueueTimerTest(unittest.TestCase):
 
 
 class PollAnnouncementTest(unittest.IsolatedAsyncioTestCase):
+    async def test_failed_delivery_does_not_repeat_poll_or_skip_other_recipients(self):
+        from gdo.poll.method.announce import announce
+        from gdo.base.IPC import IPC
+
+        method = announce.__new__(announce)
+        poll = MagicMock()
+        poll.get_choices.return_value = []
+        poll.column.return_value.render_txt.return_value = 'Question'
+        poll.is_multiple_choice.return_value = False
+        method.get_poll = MagicMock(return_value=poll)
+        method.empty = MagicMock()
+        channels = [MagicMock() for _ in range(3)]
+        for channel in channels:
+            channel.send_text = AsyncMock()
+        channels[1].send_text.side_effect = RuntimeError('secret token')
+        users = [MagicMock(), MagicMock()]
+        for user in users:
+            user.send = AsyncMock()
+        users[0].send.side_effect = RuntimeError('secret token')
+        module = module_poll()
+        module.start_next_poll_if_idle = MagicMock()
+
+        async def broadcast(*args):
+            await method.gdo_execute()
+
+        with patch('gdo.poll.module_poll.Application.IS_DOG', True), \
+             patch('gdo.poll.module_poll.Time.get_date', return_value='2026-11-23 12:00:00'), \
+             patch('gdo.poll.module_poll.GDO_Poll') as model, \
+             patch.object(IPC, 'execute_dog_event', side_effect=broadcast), \
+             patch('gdo.poll.method.announce.GDO_Channel.with_setting', return_value=channels), \
+             patch('gdo.poll.method.announce.GDO_User') as user_model, \
+             patch('gdo.poll.method.announce.Trans'), \
+             patch('gdo.poll.method.announce.Logger.error') as log:
+            user_model.table.return_value.with_settings_result.return_value = users
+            fetch = model.table.return_value.select.return_value.where.return_value.order.return_value.first.return_value.nocache.return_value.exec.return_value.fetch_object
+            fetch.side_effect = [poll, None]
+            await module.announce_active_poll()
+            await module.announce_active_poll()
+
+        poll.save_val.assert_called_once_with('poll_broadcasted', '2026-11-23 12:00:00')
+        for channel in channels:
+            channel.send_text.assert_awaited_once()
+        for user in users:
+            user.send.assert_awaited_once()
+        self.assertEqual(2, log.call_count)
+        self.assertNotIn('secret token', str(log.call_args_list))
+
     def test_announcement_is_configurable_but_protected(self):
         from gdo.core.GDO_Permission import GDO_Permission
         from gdo.poll.method.announce import announce
