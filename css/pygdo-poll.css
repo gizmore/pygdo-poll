@@ -1,0 +1,6 @@
+.poll-outcome progress {
+    display: block;
+    width: min(100%, 16rem);
+    height: 0.6rem;
+    margin: 0.2rem 0 0.5rem;
+}

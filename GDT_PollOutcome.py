@@ -24,11 +24,20 @@ class GDT_PollOutcome(GDT_Bool):
             return ''
         if not self._poll.is_closed():
             return escape(t('poll_results_hidden'))
+        choices = self._poll.get_choices()
+        total = sum(int(choice._vals['num_votes']) for choice in choices)
+        voters = int(choices[0]._vals['total_voters']) if choices else 0
         items = ''.join(
-            f'<li>{escape(choice.render_title())}: {escape(choice.render_percent())}</li>'
-            for choice in self._poll.get_choices()
+            f'<li><span>{escape(choice.render_title())}: '
+            f'{escape(choice.render_percent())} '
+            f'({escape(t("poll_vote_count", (int(choice._vals["num_votes"]),)))})</span>'
+            f'<progress value="{int(choice._vals["num_votes"])}" '
+            f'max="{max(total, 1)}" aria-label="{escape(choice.render_title(), quote=True)}"></progress></li>'
+            for choice in choices
         )
-        return f'<ol class="poll-outcome">{items}</ol>'
+        total_key = 'poll_total_selections' if self._poll.is_multiple_choice() else 'poll_total_votes'
+        return (f'<ol class="poll-outcome">{items}</ol><div class="poll-total">'
+                f'{escape(t(total_key, (total,)))} · {escape(t("poll_total_voters", (voters,)))}</div>')
 
     def render_cell(self) -> str:
         return self.render_html()

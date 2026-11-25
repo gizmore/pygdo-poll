@@ -209,16 +209,68 @@ class PollLimitTest(unittest.IsolatedAsyncioTestCase):
         poll = MagicMock()
         poll.get_id.return_value = '1'
         poll.is_closed.return_value = True
+        poll.is_multiple_choice.return_value = False
         choice = MagicMock()
         choice.render_title.return_value = '<Option>'
         choice.render_percent.return_value = '50%'
+        choice._vals = {'num_votes': '2', 'total_voters': '2'}
         poll.get_choices.return_value = [choice]
         with patch('gdo.core.GDT_String.t', side_effect=lambda key, *args: key), \
              patch('gdo.ui.WithIcon.t', side_effect=lambda key, *args: key), \
-             patch('gdo.poll.GDT_PollOutcome.t', side_effect=lambda key, args: '%s) %s (%s)' % args):
+             patch('gdo.poll.GDT_PollOutcome.t', side_effect=lambda key, args: {
+                 'poll_outcome': '%s) %s (%s)', 'poll_vote_count': '%d votes',
+                 'poll_total_votes': 'Total votes: %d', 'poll_total_voters': 'Voters: %d'}[key] % args):
             outcome = GDT_PollOutcome('outcome').poll(poll)
-            self.assertIn('&lt;Option&gt;', outcome.render_card())
+            rendered = outcome.render_card()
+            self.assertIn('&lt;Option&gt;', rendered)
+            self.assertIn('2 votes', rendered)
+            self.assertIn('Total votes: 2', rendered)
+            self.assertIn('Voters: 2', rendered)
+            self.assertIn('<progress value="2" max="2"', rendered)
             self.assertEqual('1) <Option> (50%)', outcome.render_irc())
+
+    def test_empty_multiple_choice_results_show_zero_selections(self):
+        from gdo.poll.GDT_PollOutcome import GDT_PollOutcome
+        poll = MagicMock()
+        poll.get_id.return_value = '1'
+        poll.is_closed.return_value = True
+        poll.is_multiple_choice.return_value = True
+        choice = MagicMock()
+        choice._vals = {'num_votes': '0', 'total_voters': '0'}
+        choice.render_title.return_value = 'Yes'
+        choice.render_percent.return_value = '0%'
+        poll.get_choices.return_value = [choice]
+        with patch('gdo.core.GDT_String.t', side_effect=lambda key, *args: key), \
+             patch('gdo.ui.WithIcon.t', side_effect=lambda key, *args: key), \
+             patch('gdo.poll.GDT_PollOutcome.t', side_effect=lambda key, args: {
+                 'poll_vote_count': '%d votes', 'poll_total_selections': 'Total selections: %d',
+                 'poll_total_voters': 'Voters: %d'}[key] % args):
+            rendered = GDT_PollOutcome('outcome').poll(poll).render_html()
+        self.assertIn('Total selections: 0', rendered)
+        self.assertIn('Voters: 0', rendered)
+        self.assertIn('<progress value="0" max="1"', rendered)
+
+    def test_multiple_choice_counts_selections_and_distinct_voters(self):
+        from gdo.poll.GDT_PollOutcome import GDT_PollOutcome
+        poll = MagicMock()
+        poll.get_id.return_value = '1'
+        poll.is_closed.return_value = True
+        poll.is_multiple_choice.return_value = True
+        choices = [MagicMock(), MagicMock()]
+        for choice, count in zip(choices, (3, 1)):
+            choice._vals = {'num_votes': str(count), 'total_voters': '3'}
+            choice.render_title.return_value = 'Option'
+            choice.render_percent.return_value = '75%' if count == 3 else '25%'
+        poll.get_choices.return_value = choices
+        with patch('gdo.core.GDT_String.t', side_effect=lambda key, *args: key), \
+             patch('gdo.ui.WithIcon.t', side_effect=lambda key, *args: key), \
+             patch('gdo.poll.GDT_PollOutcome.t', side_effect=lambda key, args: {
+                 'poll_vote_count': '%d votes', 'poll_total_selections': 'Total selections: %d',
+                 'poll_total_voters': 'Voters: %d'}[key] % args):
+            rendered = GDT_PollOutcome('outcome').poll(poll).render_html()
+        self.assertIn('Total selections: 4', rendered)
+        self.assertIn('Voters: 3', rendered)
+        self.assertIn('<progress value="3" max="4"', rendered)
 
     def test_results_hidden_for_open_and_queued_polls_in_all_modes(self):
         from gdo.poll.GDT_PollOutcome import GDT_PollOutcome

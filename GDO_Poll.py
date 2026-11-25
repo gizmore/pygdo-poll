@@ -61,6 +61,7 @@ class GDO_Poll(GDO):
         if self.is_closed():
             query.select("(SELECT COUNT(*) FROM gdo_pollvote WHERE pv_choice=pc_id) num_votes")
             query.select(f"(SELECT COUNT(*) FROM gdo_pollvote JOIN gdo_pollchoice ON pc_id=pv_choice WHERE pc_poll={self.get_id()}) total_votes")
+            query.select(f"(SELECT COUNT(DISTINCT pv_user) FROM gdo_pollvote JOIN gdo_pollchoice ON pc_id=pv_choice WHERE pc_poll={self.get_id()}) total_voters")
         return query.where(f"pc_poll={self.get_id()}").order('pc_id ASC').nocache().exec().fetch_all()
 
     def get_min_choices(self) -> int:
